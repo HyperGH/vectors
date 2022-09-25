@@ -1,16 +1,11 @@
 # include <stdio.h>
 # include <stdlib.h>
 
-/* Dynamically resizable array-like struct */
-struct Vector {
-    int *pointer; // start of memory allocation
-    unsigned long int length; // controls up to how many elements are currently defined
-    unsigned long int capacity; // how much capacity is currently allocated, size of elements is capacity*sizeof int
-};
+# include "vector.h"
 
-/* Create a new vector with an initial capacity */
-struct Vector new(int capacity) {
-    struct Vector vec;
+/* Create a new vector with an initial capacity. */
+Vector vec_new(int capacity) {
+    Vector vec;
     vec.length = 0;
     vec.capacity = capacity;
     // allocate enough memory to store the elements
@@ -26,8 +21,8 @@ struct Vector new(int capacity) {
     return vec;
 }
 
-/* Expand vector dynamically as it grows */
-void _reallocate_vec(struct Vector *vec) {
+/* Expand vector dynamically as it grows. */
+void _vec_reallocate(Vector *vec) {
     if (vec->capacity == 0) { // if vector isn't allocated yet, do so now
         vec->pointer = malloc(2*sizeof(int));
         vec->capacity = 2;
@@ -42,8 +37,8 @@ void _reallocate_vec(struct Vector *vec) {
     }
 }
 
-/* Get a value from a vector by index */
-int get(struct Vector *vec, unsigned int index) {
+/* Get a value from a vector by index. */
+int vec_get(Vector *vec, unsigned int index) {
     if (index > vec->length-1) {
         fprintf(stderr, "Vector of length %ld does not have element at index %d\n", vec->length, index);
         exit(-1);
@@ -51,15 +46,15 @@ int get(struct Vector *vec, unsigned int index) {
     return vec->pointer[index];
 }
 
-/* Print a vector */
-void vprint(struct Vector *vec) {
+/* Print a vector to stdout. */
+void vec_print(Vector *vec) {
     if (vec->length == 0) {
         printf("[]\n");
     }
     else {
         printf("[");
         for (unsigned int i=0; i != vec->length; i++) {
-            printf("%d", get(vec, i));
+            printf("%d", vec_get(vec, i));
             if (i+1 != vec->length) {
                 printf(", "); // insert a comma & space after element
             }
@@ -68,15 +63,15 @@ void vprint(struct Vector *vec) {
     }
 }
 
-/* Push a new value on the vector, increases capacity if needed */
-void push(struct Vector *vec, int value) {
-    _reallocate_vec(vec);
+/* Push a new value on the vector, increases capacity if needed. */
+void vec_push(Vector *vec, int value) {
+    _vec_reallocate(vec);
     vec->length++;
     vec->pointer[vec->length-1] = value;
 }
 
-/* Remove a value from the vector and return it to the caller */
-int pop(struct Vector *vec, unsigned int index) {
+/* Remove a value from the vector and return it to the caller. */
+int vec_pop(Vector *vec, unsigned int index) {
     if (vec->length == 0 || index > vec->length-1) {
         fprintf(stderr, "Vector of length %ld does not have element at index %d\n", vec->length, index);
         exit(-1);
@@ -93,8 +88,8 @@ int pop(struct Vector *vec, unsigned int index) {
     return value;
 }
 
-/* Shrink the capacity of the vector to length+1 */
-void shrink_to_fit(struct Vector *vec) {
+/* Shrink the capacity of the vector to length+1. */
+void vec_shrink(Vector *vec) {
     vec->pointer = realloc(vec->pointer, (vec->length+1)*sizeof(int));
     vec->capacity = vec->length+1;
 
@@ -105,50 +100,24 @@ void shrink_to_fit(struct Vector *vec) {
 }
 
 /* Extend a vector with an array of elements. */
-void extend(struct Vector *vec, unsigned int size, int array[]) {
+void vec_extend(Vector *vec, unsigned int size, int array[]) {
     for(unsigned int i=0; i != size; i++) {
-        push(vec, array[i]);
+        vec_push(vec, array[i]);
     }
 }
 
 /* Convert an array to a vector. */
-struct Vector from_array(unsigned int size, int array[]) {
-    struct Vector vec = new(size);
-    extend(&vec, size, array);
+Vector vec_from_array(unsigned int size, int array[]) {
+    Vector vec = vec_new(size);
+    vec_extend(&vec, size, array);
     return vec;
 }
 
 /* Deallocate the vector, if you start adding elements again, the vector will be reallocated. */
-void vfree(struct Vector *vec) {
+void vec_free(Vector *vec) {
     free(vec->pointer);
     vec->capacity = 0;
     vec->length = 0;
-}
-
-/* Driver code */
-int main() {
-    // new vector with no capacity, if you know the approximate starting size of your vector, insert here
-    // this avoids needless reallocation
-    struct Vector vec = new(0);
-
-    vprint(&vec); // print vector contents
-
-    push(&vec, 2); // add 2
-
-    int arr[] = {1, 2, 3, 4, 5, 6};
-    extend(&vec, 6, arr);
-
-    int value = get(&vec, 0); // getting element of index 0
-    int popped = pop(&vec, 3); // removing element of index 3 and returning it
-    printf("Value: %d, Popped: %d\n", value, popped);
-
-    shrink_to_fit(&vec); // shrink capacity to be length+1
-
-    vprint(&vec);
-
-    vfree(&vec); // deallocate vector
-
-    return 0;
 }
 
 /*

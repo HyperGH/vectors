@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "*.tcc": "c",
+        "concepts": "c",
+        "memory_resource": "c",
+        "optional": "c",
+        "future": "c",
+        "new": "c",
+        "stop_token": "c",
+        "functional": "c",
+        "variant": "c"
+    }
+}
