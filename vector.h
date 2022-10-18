@@ -8,22 +8,27 @@ typedef struct Vector {
     unsigned long int capacity;
 } Vector;
 
+typedef enum return_code{
+    success, 
+    mem_alloc, 
+    invalid_index
+} return_code;
 
-struct Vector vec_new(int);
+return_code vec_new(int capacity, Vector* out);
 
-int vec_get(struct Vector *vec, unsigned int index);
+return_code vec_get(Vector *vec, unsigned int index, int* out);
 
-void vec_print(struct Vector *vec);
+return_code vec_print(Vector *vec);
 
-void vec_push(struct Vector *vec, int value);
+return_code vec_push(Vector *vec, int value);
 
-int vec_pop(struct Vector *vec, unsigned int index);
+return_code vec_pop(Vector *vec, unsigned int index, int* out);
 
-void vec_shrink(struct Vector *vec);
+return_code vec_shrink(Vector *vec);
 
-void vec_extend(struct Vector *vec, unsigned int size, int array[]);
+return_code vec_extend(struct Vector *vec, unsigned int size, int array[]);
 
-struct Vector vec_from_array(unsigned int size, int array[]);
+return_code vec_from_array(unsigned int size, int array[], Vector* out);
 
 void vec_free(struct Vector *vec);
 

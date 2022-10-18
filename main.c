@@ -7,7 +7,10 @@ int main() {
     /* New vector with no capacity, if you know the approximate starting size of your vector, insert here
     This avoids needless reallocation
     A vector with no capacity is not allocated until the first element is pushed onto it. */
-    Vector vec = vec_new(0);
+    Vector vec;
+    if (vec_new(0, &vec)) {
+        printf("Failed doing vec stuffs");
+    }
 
     vec_print(&vec); // Print vector contents
 
@@ -17,8 +20,10 @@ int main() {
     vec_extend(&vec, 6, arr);
     vec_print(&vec);
 
-    int value = vec_get(&vec, 0); // Getting element of index 0
-    int popped = vec_pop(&vec, 3); // Removing element of index 3 and returning it
+    int value;
+    int popped;
+    vec_get(&vec, 0, &value); // Getting element of index 0
+    vec_pop(&vec, 3, &popped); // Removing element of index 3 and returning it
     printf("Value: %d, Popped: %d\n", value, popped);
 
     vec_shrink(&vec); // Shrink capacity to be length+1, this reallocates the vector
